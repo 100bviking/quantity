@@ -1,9 +1,9 @@
 package klines
 
 import (
-	"encoding/json"
-	"github.com/garyburd/redigo/redis"
+	"context"
 	"quantity/common/db"
+	"strconv"
 	"time"
 )
 
@@ -31,6 +31,10 @@ type Price struct {
 	CreatedAt time.Time `gorm:"column:created_at"`
 }
 
+func (p *Price) TableName() string {
+	return "price"
+}
+
 func GetUser() (user *User, err error) {
 	if err != nil {
 		return
@@ -50,20 +54,32 @@ func clearHistoryPrice() error {
 	return db.KDB.Model(price).Where("created_at <= ?", yesterday).Delete(price).Error
 }
 
-func saveCurrentPrice(data interface{}) error {
-	str, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	_, err = db.Pool.Get().Do("Set", CURRENT_PRICE, string(str))
+func optimizePriceTable() error {
+	err := db.KDB.Raw("optimize table price").Error
 	return err
 }
 
-func getCurrentPrice() (data []byte, err error) {
-	ret, err := redis.String(db.Pool.Get().Do("Get", CURRENT_PRICE))
+func saveCurrentPrice(prices []*Price) error {
+	pipeline := db.Redis.Pipeline()
+	ctx := context.Background()
+	for _, price := range prices {
+		pipeline.HSet(ctx, CURRENT_PRICE, price.Symbol, price.Price)
+	}
+	_, err := pipeline.Exec(ctx)
+	return err
+}
+
+func getCurrentPrice() (prices map[string]float64, err error) {
+	ctx := context.Background()
+	results, err := db.Redis.HGetAll(ctx, CURRENT_PRICE).Result()
 	if err != nil {
 		return
 	}
-	data = []byte(ret)
+
+	prices = make(map[string]float64)
+	for symbol, value := range results {
+		v, _ := strconv.ParseFloat(value, 64)
+		prices[symbol] = v
+	}
 	return
 }

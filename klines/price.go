@@ -100,6 +100,16 @@ func Run() {
 		}
 		fmt.Println("success clear history price", time.Now())
 	})
+
+	err = c.AddFunc("@weekly", func() {
+		fmt.Println("start optimize price table ", time.Now())
+		err = optimizePriceTable()
+		if err != nil {
+			fmt.Println("optimize price table  error.")
+		}
+		fmt.Println("success optimize price table", time.Now())
+	})
+
 	fmt.Println("successfully register klines run")
 	c.Start()
 	select {}
