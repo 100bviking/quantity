@@ -40,8 +40,8 @@ func GetUser() (user *User, err error) {
 	return
 }
 
-func savePrice(prices []*Price) error {
-	return db.KDB.Save(prices).Error
+func saveHistoryPrice(prices []*Price) error {
+	return db.KDB.Model(&Price{}).Save(prices).Error
 }
 
 func clearHistoryPrice() error {
