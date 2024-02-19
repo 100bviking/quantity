@@ -48,10 +48,10 @@ func saveKPrice() {
 		fmt.Println("fetch price error.")
 		return
 	}
-	fmt.Println("save price count:", len(prices))
+	fmt.Println("save KPrice count:", len(prices))
 	err = saveHistoryPrice(prices)
 	if err != nil {
-		fmt.Println("save price error.")
+		fmt.Println("save KPrice error.")
 		return
 	}
 }
