@@ -1,50 +1,15 @@
 package klines
 
 import (
-	"context"
 	"fmt"
-	"github.com/adshao/go-binance/v2"
 	"github.com/robfig/cron"
-	"strconv"
-	"strings"
+	"quantity/common"
 	"time"
 )
 
-var client *binance.Client
-
-func init() {
-	user, err := GetUser()
-	if err != nil {
-		panic("user account error")
-	}
-	client = binance.NewClient(user.ApiKey, user.ApiSecret)
-}
-
-func fetchPrice() (prices []*Price, err error) {
-	now := time.Unix(time.Now().Unix()/60, 0)
-	symbolPrices, err := client.NewListPricesService().Do(context.Background())
-	if err != nil {
-		panic("error when get data from biance api")
-	}
-
-	for _, p := range symbolPrices {
-		if strings.HasSuffix(p.Symbol, "USDT") {
-			symbol := strings.TrimSuffix(p.Symbol, "USDT")
-			price, _ := strconv.ParseFloat(p.Price, 64)
-			prices = append(prices, &Price{
-				Symbol:    symbol,
-				Pair:      p.Symbol,
-				Price:     price,
-				Timestamp: now,
-			})
-		}
-	}
-	return
-}
-
 func saveKPrice() {
-	prices, err := fetchPrice()
-	if err != nil {
+	prices, err := common.FetchPrice()
+	if err != nil || len(prices) == 0 {
 		fmt.Println("fetch price error.")
 		return
 	}
@@ -57,8 +22,8 @@ func saveKPrice() {
 }
 
 func savePrice() {
-	prices, err := fetchPrice()
-	if err != nil {
+	prices, err := common.FetchPrice()
+	if err != nil || len(prices) == 0 {
 		fmt.Println("fetch price error.")
 		return
 	}
