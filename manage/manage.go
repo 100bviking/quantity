@@ -37,6 +37,10 @@ func run() {
 				fmt.Println("execute symbol strategy failed", symbol)
 				return
 			}
+
+			if order.Action == common.Hold {
+				return
+			}
 			e = common.SendOrder(order)
 			if e != nil {
 				fmt.Printf("failed to send order:%+v\n", order)
