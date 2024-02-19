@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
+// redis key
 const (
 	CURRENT_PRICE string = "CURRENT_PRICE"
+	ORDER                = "ORDER"
 )
 
 var (

@@ -5,6 +5,7 @@ import (
 	"github.com/robfig/cron"
 	"quantity/common"
 	"quantity/strategy"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -33,12 +34,18 @@ func run() {
 		return
 	}
 
+	// 同时100个并发
+	channel := make(chan int, runtime.NumCPU())
 	for _, symbol := range symbols {
-		wg.Add(1)
-		go func(symbol string) {
-			defer wg.Done()
-			for _, st := range sts {
-				// 按顺序执行所有策略
+		// 执行所有策略
+		for _, st := range sts {
+			wg.Add(1)
+			channel <- 0
+			go func(symbol string, st strategy.Strategy) {
+				defer func() {
+					wg.Done()
+					<-channel
+				}()
 				order, e := st.Analysis(symbol, priceMap[symbol])
 				if e != nil {
 					fmt.Println("execute symbol strategy failed", symbol)
@@ -48,15 +55,17 @@ func run() {
 				if order.Action == common.Hold {
 					return
 				}
-				e = common.SendOrder(order)
+				e = common.SendSubmitOrder(order)
 				if e != nil {
 					fmt.Printf("failed to send order:%+v\n", order)
 					return
 				}
-			}
-		}(symbol)
+
+			}(symbol, st)
+		}
 	}
 	wg.Wait()
+	close(channel)
 }
 
 func Run() {

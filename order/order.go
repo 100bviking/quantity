@@ -16,7 +16,20 @@ func executeOrder(submitOrder *common.SubmitOrder) (err error) {
 	if err != nil {
 		return
 	}
-	err = saveOrder(submitOrder, price)
+
+	order := &common.Order{
+		Symbol:      submitOrder.Symbol,
+		SubmitPrice: submitOrder.Price,
+		OrderPrice:  price,
+		Amount:      "100",
+		Money:       0,
+		Action:      submitOrder.Action,
+		OrderTime:   submitOrder.Timestamp,
+		Status:      common.Success,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+	}
+	err = common.SendOrder(order)
 	return
 }
 
@@ -33,7 +46,7 @@ func run() {
 		go func(symbol string) {
 			defer wg.Done()
 			// 获取 order
-			order, e := common.TakeOrder(symbol)
+			order, e := common.TakeSubmitOrder(symbol)
 			if e != nil {
 				fmt.Printf("failed to take:%s,order err:%+v\n", symbol, e)
 				return
@@ -50,6 +63,22 @@ func run() {
 		}(symbol)
 	}
 	wg.Wait()
+
+	// 执行结束统一把订单入库
+	orders, err := common.TakeAllOrder()
+	if err != nil {
+		fmt.Println("failed to take all orders")
+		return
+	}
+
+	if len(orders) == 0 {
+		return
+	}
+
+	err = saveOrders(orders)
+	if err != nil {
+		fmt.Println("failed to save orders.")
+	}
 }
 
 func Run() {
