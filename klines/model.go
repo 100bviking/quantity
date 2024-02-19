@@ -1,7 +1,6 @@
 package klines
 
 import (
-	"context"
 	"quantity/common"
 	"quantity/common/db"
 	"time"
@@ -19,15 +18,5 @@ func clearHistoryPrice() error {
 
 func optimizePriceTable() error {
 	err := db.KDB.Raw("optimize table price").Error
-	return err
-}
-
-func saveCurrentPrice(prices []*common.Price) error {
-	pipeline := db.Redis.Pipeline()
-	ctx := context.Background()
-	for _, price := range prices {
-		pipeline.HSet(ctx, common.CURRENT_PRICE, price.Symbol, price.Price)
-	}
-	_, err := pipeline.Exec(ctx)
 	return err
 }

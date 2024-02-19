@@ -1,21 +1,11 @@
 package manage
 
 import (
-	"context"
 	"errors"
 	"gorm.io/gorm"
 	"quantity/common"
 	"quantity/common/db"
 )
-
-func getCurrentSymbol() (symbols []string, err error) {
-	ctx := context.Background()
-	symbols, err = db.Redis.HKeys(ctx, common.CURRENT_PRICE).Result()
-	if err != nil {
-		return
-	}
-	return
-}
 
 func getHistoryPrice() (priceMap map[string][]*common.Price, err error) {
 	var (

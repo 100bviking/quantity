@@ -8,7 +8,7 @@ import (
 )
 
 func saveKPrice() {
-	prices, err := common.FetchPrice()
+	prices, err := common.FetchPrices()
 	if err != nil || len(prices) == 0 {
 		fmt.Println("fetch price error.")
 		return
@@ -22,13 +22,13 @@ func saveKPrice() {
 }
 
 func savePrice() {
-	prices, err := common.FetchPrice()
+	prices, err := common.FetchPrices()
 	if err != nil || len(prices) == 0 {
 		fmt.Println("fetch price error.")
 		return
 	}
 	fmt.Println("save price count:", len(prices))
-	err = saveCurrentPrice(prices)
+	err = common.SaveCurrentPrice(prices)
 	if err != nil {
 		fmt.Println("save current price error.")
 		return

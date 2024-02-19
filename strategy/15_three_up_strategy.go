@@ -14,7 +14,7 @@ func NewFifteenUpStrategy() Strategy {
 	return &FifteenUpStrategy{}
 }
 
-func (f *FifteenUpStrategy) Analysis(symbol string, prices []*common.Price) (action *common.Order, err error) {
+func (f *FifteenUpStrategy) Analysis(symbol string, prices []*common.Price) (action *common.SubmitOrder, err error) {
 	if len(prices) < 3 {
 		err = fmt.Errorf("strategy fifteenUpStrategy not execute,because price len not enough:%s", len(prices))
 		return
@@ -28,7 +28,7 @@ func (f *FifteenUpStrategy) Analysis(symbol string, prices []*common.Price) (act
 		return
 	}
 
-	action = &common.Order{
+	action = &common.SubmitOrder{
 		Symbol:    symbol,
 		Price:     price[symbol],
 		Action:    common.Hold,

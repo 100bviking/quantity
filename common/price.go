@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"github.com/adshao/go-binance/v2"
+	"quantity/common/db"
 	"strconv"
 	"strings"
 	"time"
@@ -37,7 +38,7 @@ func init() {
 	client = binance.NewClient(user.ApiKey, user.ApiSecret)
 }
 
-func FetchPrice() (prices []*Price, err error) {
+func FetchPrices() (prices []*Price, err error) {
 	now := time.Unix(time.Now().Unix()/60, 0)
 	symbolPrices, err := client.NewListPricesService().Do(context.Background())
 	if err != nil {
@@ -56,5 +57,34 @@ func FetchPrice() (prices []*Price, err error) {
 			})
 		}
 	}
+	return
+}
+
+func GetCurrentSymbol() (symbols []string, err error) {
+	ctx := context.Background()
+	symbols, err = db.Redis.HKeys(ctx, CURRENT_PRICE).Result()
+	if err != nil {
+		return
+	}
+	return
+}
+
+func SaveCurrentPrice(prices []*Price) error {
+	pipeline := db.Redis.Pipeline()
+	ctx := context.Background()
+	for _, price := range prices {
+		pipeline.HSet(ctx, CURRENT_PRICE, price.Symbol, price.Price)
+	}
+	_, err := pipeline.Exec(ctx)
+	return err
+}
+
+func FetchSymbolPrice(symbol string) (price float64, err error) {
+	ctx := context.Background()
+	ret, err := db.Redis.HGet(ctx, CURRENT_PRICE, symbol).Result()
+	if err != nil {
+		return
+	}
+	price, err = strconv.ParseFloat(ret, 64)
 	return
 }

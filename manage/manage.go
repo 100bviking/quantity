@@ -13,7 +13,7 @@ var wg sync.WaitGroup
 
 func run() {
 	// 获取当前所有symbol
-	symbols, err := getCurrentSymbol()
+	symbols, err := common.GetCurrentSymbol()
 	if err != nil || len(symbols) == 0 {
 		fmt.Println("get Current Symbol failed")
 		return

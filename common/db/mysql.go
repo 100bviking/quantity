@@ -8,6 +8,7 @@ import (
 var (
 	AccountDB *gorm.DB
 	KDB       *gorm.DB
+	OrderDB   *gorm.DB
 )
 
 func init() {
@@ -24,4 +25,11 @@ func init() {
 		panic("init klines db failed")
 	}
 	KDB = kdb
+
+	dsnOrder := "root:123456@tcp(127.0.0.1:3306)/order?charset=utf8mb4&parseTime=True&loc=Local"
+	odb, err := gorm.Open(mysql.Open(dsnOrder), &gorm.Config{})
+	if err != nil {
+		panic("init order db failed")
+	}
+	OrderDB = odb
 }
