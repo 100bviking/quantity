@@ -9,7 +9,14 @@ import (
 	"time"
 )
 
-var wg sync.WaitGroup
+var (
+	wg  sync.WaitGroup
+	sts []strategy.Strategy
+)
+
+func init() {
+	sts = append(sts, strategy.NewFifteenUpStrategy(), strategy.NewFifteenDownStrategy())
+}
 
 func run() {
 	// 获取当前所有symbol
@@ -26,25 +33,26 @@ func run() {
 		return
 	}
 
-	// 获取策略
-	st := strategy.NewFifteenUpStrategy()
 	for _, symbol := range symbols {
 		wg.Add(1)
 		go func(symbol string) {
 			defer wg.Done()
-			order, e := st.Analysis(symbol, priceMap[symbol])
-			if e != nil {
-				fmt.Println("execute symbol strategy failed", symbol)
-				return
-			}
+			for _, st := range sts {
+				// 按顺序执行所有策略
+				order, e := st.Analysis(symbol, priceMap[symbol])
+				if e != nil {
+					fmt.Println("execute symbol strategy failed", symbol)
+					return
+				}
 
-			if order.Action == common.Hold {
-				return
-			}
-			e = common.SendOrder(order)
-			if e != nil {
-				fmt.Printf("failed to send order:%+v\n", order)
-				return
+				if order.Action == common.Hold {
+					return
+				}
+				e = common.SendOrder(order)
+				if e != nil {
+					fmt.Printf("failed to send order:%+v\n", order)
+					return
+				}
 			}
 		}(symbol)
 	}
