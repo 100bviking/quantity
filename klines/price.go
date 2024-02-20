@@ -39,7 +39,8 @@ func Run() {
 	fmt.Println("start klines service.")
 	c := cron.New()
 
-	err := c.AddFunc("0 */15 * * * *", func() {
+	// 1小时运行一次
+	err := c.AddFunc("0 0 * * * *", func() {
 		fmt.Println("start run klines", time.Now())
 		saveKPrice()
 		fmt.Println("success run kines", time.Now())

@@ -41,7 +41,7 @@ func init() {
 }
 
 func FetchPrices() (prices []*Price, err error) {
-	now := time.Unix(time.Now().Unix()/60, 0)
+	now := time.Now()
 	symbolPrices, err := client.NewListPricesService().Do(context.Background())
 	if err != nil {
 		return
