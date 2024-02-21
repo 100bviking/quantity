@@ -1,6 +1,6 @@
 module quantity
 
-go 1.21.6
+go 1.21
 
 require (
 	github.com/adshao/go-binance/v2 v2.4.5
