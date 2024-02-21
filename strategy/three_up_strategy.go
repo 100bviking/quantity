@@ -16,7 +16,7 @@ func NewFifteenUpStrategy() Strategy {
 
 func (f *FifteenUpStrategy) Analysis(symbol string, prices []*common.Price) (action *common.SubmitOrder, err error) {
 	if len(prices) < 3 {
-		err = fmt.Errorf("strategy fifteenUpStrategy not execute,because price len not enough:%s", len(prices))
+		err = fmt.Errorf("strategy fifteenUpStrategy not execute,because price len not enough:%d", len(prices))
 		return
 	}
 	prices = prices[0:3]
