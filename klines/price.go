@@ -75,14 +75,12 @@ func saveKPrice() (err error) {
 				fmt.Println("failed to query history klines", symbol, startTime, endTime, e)
 				return
 			}
-			if len(kLinePrices) == 0 {
-				fmt.Println("kline data is empty:", symbol)
-				return
-			}
-			err = saveKLinesPrice(kLinePrices)
-			if err != nil {
-				fmt.Println("saveKLinesPrice failed:", err)
-				return
+			if len(kLinePrices) > 0 {
+				err = saveKLinesPrice(kLinePrices)
+				if err != nil {
+					fmt.Println("saveKLinesPrice failed:", err)
+					return
+				}
 			}
 
 			err = common.UpdateSymbolCursor(symbol, endTime)
