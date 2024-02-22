@@ -6,12 +6,8 @@ import (
 	"time"
 )
 
-func saveHistoryPrice(prices []*common.Price) error {
-	return db.KDB.Model(&common.Price{}).Save(prices).Error
-}
-
 func clearHistoryPrice() error {
-	price := new(common.Price)
+	price := new(common.Cursor)
 	yesterday := time.Now().AddDate(0, 0, -1)
 	return db.KDB.Model(price).Where("created_at <= ?", yesterday).Delete(price).Error
 }
@@ -19,4 +15,13 @@ func clearHistoryPrice() error {
 func optimizePriceTable() error {
 	err := db.KDB.Raw("optimize table price").Error
 	return err
+}
+
+func saveKLinesPrice(kLines []*common.KLine) (err error) {
+	kline := new(common.KLine)
+	err = db.KLinesDB.Model(kline).Create(kLines).Error
+	if err != nil {
+		return
+	}
+	return
 }

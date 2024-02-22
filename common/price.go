@@ -19,20 +19,21 @@ var (
 	client *binance.Client
 )
 
-type Price struct {
-	ID                 int64     `gorm:"column:id"`
-	Symbol             string    `gorm:"column:symbol"`
-	Pair               string    `gorm:"column:pair"`
-	Price              float64   `gorm:"column:price"`
-	SevenAvgPrice      float64   `gorm:"column:seven_avg_price"`
-	TwentyFiveAvgPrice float64   `gorm:"column:twenty_five_avg_price"`
-	NinetyNineAvgPrice float64   `gorm:"column:ninety_nine_avg_price"`
-	Timestamp          time.Time `gorm:"column:timestamp"`
-	CreatedAt          time.Time `gorm:"column:created_at"`
+type Cursor struct {
+	Symbol    string    `gorm:"column:symbol"`
+	Timestamp time.Time `gorm:"column:timestamp"`
+	CreatedAt time.Time `gorm:"column:created_at"`
 }
 
-func (p *Price) TableName() string {
-	return "price"
+func (p *Cursor) TableName() string {
+	return "cursor"
+}
+
+type Price struct {
+	Symbol    string
+	Pair      string
+	Price     float64
+	Timestamp time.Time
 }
 
 func init() {
