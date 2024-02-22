@@ -72,10 +72,11 @@ func saveKPrice() (err error) {
 
 			kLinePrices, e := common.QueryHistoryKLines(symbol, startTime, endTime)
 			if e != nil {
-				fmt.Println("failed to query history klines", err)
+				fmt.Println("failed to query history klines", symbol, startTime, endTime, e)
 				return
 			}
 			if len(kLinePrices) == 0 {
+				fmt.Println("kline data is empty:", symbol)
 				return
 			}
 			err = saveKLinesPrice(kLinePrices)
@@ -114,8 +115,8 @@ func Run() {
 	fmt.Println("start klines service.")
 	c := cron.New()
 
-	// 10 秒运行一次
-	err := c.AddFunc("*/10 * * * * *", func() {
+	// 1 分钟运行一次
+	err := c.AddFunc("0 * * * * *", func() {
 		fmt.Println("start run klines", time.Now())
 		err := saveKPrice()
 		fmt.Println("success run kines", time.Now(), err)

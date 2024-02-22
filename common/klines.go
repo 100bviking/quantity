@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"quantity/common/db"
@@ -27,7 +28,7 @@ func (k *KLine) TableName() string {
 
 func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePrices []*KLine, err error) {
 	limit := int((endTime - startTime) / 3600)
-	pair := symbol + "USDT"
+	pair := fmt.Sprintf("%s%s", symbol, "USDT")
 	start := startTime * 1000
 	end := endTime * 1000
 	symbolPrices, err := client.NewKlinesService().
@@ -35,6 +36,9 @@ func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePri
 		StartTime(start).
 		EndTime(end).
 		Interval("1h").Limit(limit).Do(context.Background())
+	if err != nil {
+		return
+	}
 
 	for _, price := range symbolPrices {
 		startAt := time.Unix(price.OpenTime/1000, 0)
@@ -67,7 +71,7 @@ func GetSymbolCursor() (cursorMap map[string]*Cursor, err error) {
 		return
 	}
 	for _, c := range cursors {
-		cursorMap[c.Symbol] = cursor
+		cursorMap[c.Symbol] = c
 	}
 	return
 }
