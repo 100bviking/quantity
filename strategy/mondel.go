@@ -9,7 +9,7 @@ import (
 
 func getCurrentPrice() (prices map[string]float64, err error) {
 	ctx := context.Background()
-	results, err := db.Redis.HGetAll(ctx, common.CURRENT_PRICE).Result()
+	results, err := db.Redis.HGetAll(ctx, common.CurrentPrice).Result()
 	if err != nil {
 		return
 	}

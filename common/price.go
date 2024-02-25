@@ -9,10 +9,18 @@ import (
 	"time"
 )
 
+type Interval int
+
 // redis key
 const (
-	CURRENT_PRICE string = "CURRENT_PRICE"
-	ORDER                = "ORDER"
+	CurrentPrice string = "CURRENT_PRICE"
+	ORDER               = "ORDER"
+)
+
+const (
+	Day7  Interval = 7
+	Day25 Interval = 25
+	Day99 Interval = 99
 )
 
 var (
@@ -31,7 +39,6 @@ func (p *Cursor) TableName() string {
 
 type Price struct {
 	Symbol    string
-	Pair      string
 	Price     float64
 	Timestamp time.Time
 }
@@ -57,7 +64,6 @@ func FetchPrices() (prices []*Price, err error) {
 			price, _ := strconv.ParseFloat(p.Price, 64)
 			prices = append(prices, &Price{
 				Symbol:    symbol,
-				Pair:      p.Symbol,
 				Price:     price,
 				Timestamp: now,
 			})
@@ -68,7 +74,7 @@ func FetchPrices() (prices []*Price, err error) {
 
 func GetCurrentSymbol() (symbols []string, err error) {
 	ctx := context.Background()
-	symbols, err = db.Redis.HKeys(ctx, CURRENT_PRICE).Result()
+	symbols, err = db.Redis.HKeys(ctx, CurrentPrice).Result()
 	if err != nil {
 		return
 	}
@@ -79,7 +85,7 @@ func SaveCurrentPrice(prices []*Price) error {
 	pipeline := db.Redis.Pipeline()
 	ctx := context.Background()
 	for _, price := range prices {
-		pipeline.HSet(ctx, CURRENT_PRICE, price.Symbol, price.Price)
+		pipeline.HSet(ctx, CurrentPrice, price.Symbol, price.Price)
 	}
 	_, err := pipeline.Exec(ctx)
 	return err
@@ -87,7 +93,7 @@ func SaveCurrentPrice(prices []*Price) error {
 
 func FetchSymbolPrice(symbol string) (price float64, err error) {
 	ctx := context.Background()
-	ret, err := db.Redis.HGet(ctx, CURRENT_PRICE, symbol).Result()
+	ret, err := db.Redis.HGet(ctx, CurrentPrice, symbol).Result()
 	if err != nil {
 		return
 	}
