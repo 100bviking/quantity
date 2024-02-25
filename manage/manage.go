@@ -27,6 +27,8 @@ func run() {
 		return
 	}
 
+	symbols = []string{"COTI"}
+
 	channel := make(chan int, runtime.NumCPU())
 	for _, symbol := range symbols {
 		// 执行所有策略
@@ -71,7 +73,7 @@ func Run() {
 	fmt.Println("start manage service.")
 	c := cron.New()
 
-	err := c.AddFunc("30 0 * * * *", func() {
+	err := c.AddFunc("30 * * * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())

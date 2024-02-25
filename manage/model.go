@@ -14,10 +14,11 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 		day25Prices []*common.Price
 		day99Prices []*common.Price
 	)
-	err = db.KLinesDB.Table("day7_avg_kline").
+	err = db.KLinesDB.Table("kline").
+		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 6 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
 		Order("timestamp desc").
-		Limit(24 * 7).
+		Limit(24).
 		Find(&day7Prices).Error
 	err = common.IngoreNotFoundError(err)
 	if err != nil || len(day7Prices) == 0 {
@@ -26,10 +27,11 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 	priceMap[common.Day7] = day7Prices
 
 	// 获取25日均线
-	err = db.KLinesDB.Table("day25_avg_kline").
+	err = db.KLinesDB.Table("kline").
+		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 24 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
 		Order("timestamp desc").
-		Limit(24 * 7).
+		Limit(24).
 		Find(&day25Prices).Error
 	err = common.IngoreNotFoundError(err)
 	if err != nil || len(day25Prices) == 0 {
@@ -38,10 +40,11 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 	priceMap[common.Day25] = day25Prices
 
 	// 获取99日均线
-	err = db.KLinesDB.Table("day99_avg_kline").
+	err = db.KLinesDB.Table("kline").
+		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 98 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
 		Order("timestamp desc").
-		Limit(24 * 7).
+		Limit(24).
 		Find(&day99Prices).Error
 	err = common.IngoreNotFoundError(err)
 	if err != nil || len(day99Prices) == 0 {
