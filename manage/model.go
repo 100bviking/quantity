@@ -17,7 +17,7 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 	err = db.KLinesDB.Table("kline").
 		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 6 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
-		Order("timestamp").
+		Order("timestamp desc").
 		Limit(24).
 		Find(&day7Prices).Error
 	err = common.IngoreNotFoundError(err)
@@ -30,7 +30,7 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 	err = db.KLinesDB.Table("kline").
 		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 24 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
-		Order("timestamp").
+		Order("timestamp desc").
 		Limit(24).
 		Find(&day25Prices).Error
 	err = common.IngoreNotFoundError(err)
@@ -43,7 +43,7 @@ func getHistoryPrice(symbol string) (priceMap map[common.Interval][]*common.Pric
 	err = db.KLinesDB.Table("kline").
 		Select("symbol,k_start_time as timestamp,avg(toFloat64OrZero(end_price)) over (PARTITION BY symbol ORDER BY timestamp rows between 98 preceding and current row ) as price").
 		Where("symbol = ?", symbol).
-		Order("timestamp").
+		Order("timestamp desc").
 		Limit(24).
 		Find(&day99Prices).Error
 	err = common.IngoreNotFoundError(err)
