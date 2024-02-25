@@ -27,8 +27,6 @@ func run() {
 		return
 	}
 
-	symbols = []string{"COTI"}
-
 	channel := make(chan int, runtime.NumCPU())
 	for _, symbol := range symbols {
 		// 执行所有策略
@@ -41,6 +39,7 @@ func run() {
 					<-channel
 				}()
 
+				fmt.Println("====>starting analysis symbol kline", symbol)
 				// 获取历史数据
 				priceMap, err := getHistoryPrice(symbol)
 				if err != nil || len(priceMap) == 0 {
@@ -61,7 +60,7 @@ func run() {
 					fmt.Printf("failed to send order:%+v\n", order)
 					return
 				}
-
+				fmt.Println("====>end analysis symbol kline", symbol)
 			}(symbol, st)
 		}
 	}
