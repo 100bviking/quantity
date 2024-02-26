@@ -166,3 +166,16 @@ func FetchAllOrders() (ordersMap map[string][]*Order, err error) {
 	}
 	return
 }
+
+func FetchSymbolBuyLastOrder(symbol string) (order *Order, err error) {
+	order = new(Order)
+
+	err = db.OrderDB.Model(order).
+		Where("symbol = ? and action = ?", symbol, Buy).
+		Order("created_at desc").First(order).Error
+	err = IngoreNotFoundError(err)
+	if err != nil {
+		return
+	}
+	return
+}

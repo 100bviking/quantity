@@ -3,6 +3,7 @@ package order
 import (
 	"fmt"
 	"quantity/common"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -21,13 +22,28 @@ func executeOrder(submitOrder *common.SubmitOrder) (err error) {
 		Symbol:      submitOrder.Symbol,
 		SubmitPrice: submitOrder.Price,
 		OrderPrice:  price,
-		Amount:      "100",
-		Money:       0,
 		Action:      submitOrder.Action,
 		OrderTime:   submitOrder.Timestamp,
 		Status:      common.Success,
 		CreatedAt:   time.Time{},
 		UpdatedAt:   time.Time{},
+	}
+
+	// 每次买入100u
+	if order.Action == common.Buy {
+		order.Money = 100
+		order.Amount = fmt.Sprintf("%f", order.Money/price)
+	}
+
+	// 卖出,从最后一笔买入获取金额和个数
+	if order.Action == common.Sell {
+		lastBuyOrder, e := common.FetchSymbolBuyLastOrder(order.Symbol)
+		if e != nil {
+			return e
+		}
+		order.Amount = lastBuyOrder.Amount
+		amount, _ := strconv.ParseFloat(order.Amount, 64)
+		order.Money = amount * order.OrderPrice
 	}
 	err = common.SendOrder(order)
 	return
