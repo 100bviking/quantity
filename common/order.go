@@ -149,3 +149,20 @@ func SymbolOrderSumAction(symbol string) (sum int64, err error) {
 	}
 	return
 }
+
+func FetchAllOrders() (ordersMap map[string][]*Order, err error) {
+	order := new(Order)
+	ordersMap = make(map[string][]*Order)
+
+	var orders []*Order
+	err = db.OrderDB.Model(order).Order("created_at").Find(&orders).Error
+	err = IngoreNotFoundError(err)
+	if err != nil {
+		return
+	}
+
+	for _, o := range orders {
+		ordersMap[o.Symbol] = append(ordersMap[o.Symbol], o)
+	}
+	return
+}

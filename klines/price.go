@@ -100,20 +100,29 @@ func savePrice() {
 		fmt.Println("fetch price error.")
 		return
 	}
+
 	fmt.Println("save price count:", len(prices))
 	err = common.SaveCurrentPrice(prices)
 	if err != nil {
 		fmt.Println("save current price error.")
 		return
 	}
+
+	ordersMap, err := common.FetchAllOrders()
+	if err != nil {
+		fmt.Println("failed to fetch all orders")
+		return
+	}
+
+	common.CountMoney(prices, ordersMap)
 }
 
 func Run() {
 	fmt.Println("start klines service.")
 	c := cron.New()
 
-	// 1 分钟运行一次
-	err := c.AddFunc("0 * * * * *", func() {
+	// 1 小时运行一次,保存k线
+	err := c.AddFunc("0 0 * * * *", func() {
 		fmt.Println("start run klines", time.Now())
 		err := saveKPrice()
 		fmt.Println("success run kines", time.Now(), err)
@@ -122,6 +131,7 @@ func Run() {
 		panic("failed to add crontab run in klines")
 	}
 
+	// 1分钟运行一次保存当前价格到redis
 	err = c.AddFunc("0 * * * * *", func() {
 		fmt.Println("start run price", time.Now())
 		savePrice()

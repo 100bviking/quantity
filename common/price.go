@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"fmt"
 	"github.com/adshao/go-binance/v2"
 	"quantity/common/db"
 	"strconv"
@@ -121,4 +122,35 @@ func FetchSymbolPrice(symbol string) (price float64, err error) {
 	}
 	price, err = strconv.ParseFloat(ret, 64)
 	return
+}
+
+func CountMoney(prices map[string]*Price, orders map[string][]*Order) {
+	total := 0.0
+	invest := 0.0
+	for symbol, price := range prices {
+		sum := 0.0
+		buy := 0.0
+		if order, ok := orders[symbol]; ok {
+			var i = 0
+			for i < len(order) {
+				amount, _ := strconv.ParseFloat(order[i].Amount, 64)
+				// 计算出总投资额
+				if order[i].Action == Buy {
+					buy += order[i].SubmitPrice * amount
+				}
+				sum += amount * float64(order[i].Action) * order[i].SubmitPrice
+				i++
+			}
+
+			// 奇数代表还没有卖出,减去1笔当前价格
+			if i%2 == 1 {
+				amount, _ := strconv.ParseFloat(order[i-1].Amount, 64)
+				sum += -amount * float64(order[i-1].Action) * price.Price
+			}
+		}
+		fmt.Printf("symbol:%s,buy:%f,earn money:%f\n", symbol, buy, -sum)
+		invest += buy
+		total += sum
+	}
+	fmt.Printf("total invest:%f ,money:%f\n", invest, -total)
 }

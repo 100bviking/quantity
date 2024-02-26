@@ -72,7 +72,8 @@ func Run() {
 	fmt.Println("start manage service.")
 	c := cron.New()
 
-	err := c.AddFunc("30 * * * * *", func() {
+	// 15分钟分析一次k线
+	err := c.AddFunc("30 */15 * * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())
