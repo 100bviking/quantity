@@ -19,9 +19,9 @@ const (
 type Action int
 
 const (
-	Hold Action = 0 // 不做任何操作
-	Buy  Action = 1 // 买入建议
-	Sell Action = 2 // 卖出建议
+	Hold Action = 0  // 不做任何操作
+	Buy  Action = 1  // 买入建议
+	Sell Action = -1 // 卖出建议
 )
 
 // SubmitOrder 订单
@@ -132,6 +132,18 @@ func TakeAllOrder() (orders []*Order, err error) {
 			return
 		}
 		orders = append(orders, order)
+	}
+	return
+}
+
+func SymbolOrderSumAction(symbol string) (sum int64, err error) {
+	order := new(Order)
+	err = db.OrderDB.Model(order).
+		Select("symbol,sum(action) as sum").
+		Where("symbol = ?", symbol).Pluck("sum", &sum).Error
+	err = IngoreNotFoundError(err)
+	if err != nil {
+		return
 	}
 	return
 }

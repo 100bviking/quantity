@@ -43,7 +43,14 @@ func (up *AvgPriceUpStrategy) Analysis(symbol string, prices map[common.Interval
 		// 历史一周以内发生过穿越行为,7日均线曾低于25日均线，且25日均线低于99日均线
 		for i := 0; i < length; i++ {
 			if day7Prices[i].Price < day25Prices[i].Price && day25Prices[i].Price < day99Prices[i].Price {
-				action.Action = common.Buy
+				sum, e := common.SymbolOrderSumAction(symbol)
+				if e != nil {
+					return nil, e
+				}
+				// symbol当前没有买单,或者买卖单数量相同的情况下可以再次买入
+				if sum == 0 {
+					action.Action = common.Buy
+				}
 				break
 			}
 		}

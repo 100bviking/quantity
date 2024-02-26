@@ -43,7 +43,14 @@ func (down *AvgPriceDownStrategy) Analysis(symbol string, prices map[common.Inte
 		// 历史一周以内发生过穿越行为,7日均线穿过了25日和99日均线
 		for i := 0; i < length; i++ {
 			if day7Prices[i].Price > day25Prices[i].Price && day7Prices[i].Price > day99Prices[i].Price {
-				action.Action = common.Sell
+				sum, e := common.SymbolOrderSumAction(symbol)
+				if e != nil {
+					return nil, e
+				}
+				// symbol当前有1个买单,或者买单大于卖单的情况下,才能卖出
+				if sum >= 1 {
+					action.Action = common.Sell
+				}
 				break
 			}
 		}
