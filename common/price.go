@@ -24,8 +24,9 @@ const (
 )
 
 var (
-	client       *binance.Client
-	IngoreSymbol map[string]struct{}
+	client          *binance.Client
+	BlacklistSymbol map[string]struct{}
+	WhitelistSymbol map[string]struct{}
 )
 
 type Cursor struct {
@@ -51,8 +52,11 @@ func init() {
 	}
 	client = binance.NewClient(user.ApiKey, user.ApiSecret)
 
-	IngoreSymbol = map[string]struct{}{
+	BlacklistSymbol = map[string]struct{}{
 		"AEUR": {},
+	}
+	WhitelistSymbol = map[string]struct{}{
+		"JUP": {},
 	}
 }
 
@@ -68,11 +72,13 @@ func FetchPrices() (prices []*Price, err error) {
 			symbol := strings.TrimSuffix(p.Symbol, "USDT")
 
 			// 忽略稳定币，以及一些UP和DOWN的币
-			if _, ok := IngoreSymbol[symbol]; ok {
-				continue
-			}
-			if strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
-				continue
+			if _, okW := WhitelistSymbol[symbol]; !okW {
+				if _, okB := BlacklistSymbol[symbol]; okB {
+					continue
+				}
+				if strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
+					continue
+				}
 			}
 
 			price, _ := strconv.ParseFloat(p.Price, 64)
