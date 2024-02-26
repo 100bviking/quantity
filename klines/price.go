@@ -132,24 +132,6 @@ func Run() {
 		panic("failed to add crontab run in klines")
 	}
 
-	err = c.AddFunc("0 0 * * * *", func() {
-		fmt.Println("start clear history price", time.Now())
-		err = clearHistoryPrice()
-		if err != nil {
-			fmt.Println("clear history price error.")
-		}
-		fmt.Println("success clear history price", time.Now())
-	})
-
-	err = c.AddFunc("@weekly", func() {
-		fmt.Println("start optimize price table ", time.Now())
-		err = optimizePriceTable()
-		if err != nil {
-			fmt.Println("optimize price table  error.")
-		}
-		fmt.Println("success optimize price table", time.Now())
-	})
-
 	fmt.Println("successfully register klines run")
 	c.Start()
 	select {}

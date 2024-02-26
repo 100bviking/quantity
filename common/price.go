@@ -60,12 +60,14 @@ func init() {
 	}
 }
 
-func FetchPrices() (prices []*Price, err error) {
+func FetchPrices() (prices map[string]*Price, err error) {
 	now := time.Now()
 	symbolPrices, err := client.NewListPricesService().Do(context.Background())
 	if err != nil {
 		return
 	}
+
+	prices = make(map[string]*Price)
 
 	for _, p := range symbolPrices {
 		if strings.HasSuffix(p.Symbol, "USDT") {
@@ -82,11 +84,11 @@ func FetchPrices() (prices []*Price, err error) {
 			}
 
 			price, _ := strconv.ParseFloat(p.Price, 64)
-			prices = append(prices, &Price{
+			prices[symbol] = &Price{
 				Symbol:    symbol,
 				Price:     price,
 				Timestamp: now,
-			})
+			}
 		}
 	}
 	return
@@ -101,11 +103,11 @@ func GetCurrentSymbol() (symbols []string, err error) {
 	return
 }
 
-func SaveCurrentPrice(prices []*Price) error {
+func SaveCurrentPrice(prices map[string]*Price) error {
 	pipeline := db.Redis.Pipeline()
 	ctx := context.Background()
-	for _, price := range prices {
-		pipeline.HSet(ctx, CurrentPrice, price.Symbol, price.Price)
+	for symbol, price := range prices {
+		pipeline.HSet(ctx, CurrentPrice, symbol, price.Price)
 	}
 	_, err := pipeline.Exec(ctx)
 	return err
