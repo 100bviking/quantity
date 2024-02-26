@@ -14,7 +14,7 @@ type Interval int
 // redis key
 const (
 	CurrentPrice string = "CURRENT_PRICE"
-	ORDER               = "ORDER"
+	ORDER        string = "ORDER"
 )
 
 const (
@@ -24,7 +24,8 @@ const (
 )
 
 var (
-	client *binance.Client
+	client       *binance.Client
+	IngoreSymbol map[string]struct{}
 )
 
 type Cursor struct {
@@ -49,6 +50,10 @@ func init() {
 		panic("user account error")
 	}
 	client = binance.NewClient(user.ApiKey, user.ApiSecret)
+
+	IngoreSymbol = map[string]struct{}{
+		"AEUR": {},
+	}
 }
 
 func FetchPrices() (prices []*Price, err error) {
@@ -61,6 +66,15 @@ func FetchPrices() (prices []*Price, err error) {
 	for _, p := range symbolPrices {
 		if strings.HasSuffix(p.Symbol, "USDT") {
 			symbol := strings.TrimSuffix(p.Symbol, "USDT")
+
+			// 忽略稳定币，以及一些UP和DOWN的币
+			if _, ok := IngoreSymbol[symbol]; ok {
+				continue
+			}
+			if strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
+				continue
+			}
+
 			price, _ := strconv.ParseFloat(p.Price, 64)
 			prices = append(prices, &Price{
 				Symbol:    symbol,
