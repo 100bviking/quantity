@@ -53,9 +53,7 @@ func init() {
 	client = binance.NewClient(user.ApiKey, user.ApiSecret)
 
 	BlacklistSymbol = map[string]struct{}{
-		"AEUR":  {},
-		"TUSD":  {},
-		"FDUSD": {},
+		"AEUR": {},
 	}
 	WhitelistSymbol = map[string]struct{}{
 		"JUP": {},
@@ -78,7 +76,7 @@ func FetchPrices() (prices []*Price, err error) {
 				if _, okB := BlacklistSymbol[symbol]; okB {
 					continue
 				}
-				if strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
+				if strings.HasSuffix(symbol, "USD") || strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
 					continue
 				}
 			}
