@@ -139,7 +139,7 @@ func TakeAllOrder() (orders []*Order, err error) {
 func SymbolOrderSumAction(symbol string) (sum int64, err error) {
 	order := new(Order)
 	err = db.OrderDB.Model(order).
-		Select("symbol,sum(action) as sum").
+		Select("sum(action) as sum").
 		Where("symbol = ?", symbol).
 		Group("symbol").
 		Pluck("sum", &sum).Error
