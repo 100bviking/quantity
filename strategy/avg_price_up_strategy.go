@@ -45,7 +45,7 @@ func (up *AvgPriceUpStrategy) Analysis(symbol string, prices map[common.Interval
 
 	// 当前价格上涨,当前价格大于7日均线价格，并且7日均线价格大于25日均线价格，且25日均线价格大于99日均线价格
 	if sum == 0 && currentPrice > day7LastPrice && day7LastPrice > day25LastPrice && day25LastPrice > day99LastPrice {
-		// 历史一周以内发生过穿越行为,7日均线曾低于25日均线，且25日均线低于99日均线
+		// 历史24小时以内发生过穿越行为,7日均线曾低于25日均线，且25日均线低于99日均线
 		for i := 0; i < length; i++ {
 			if day7Prices[i].Price < day25Prices[i].Price && day25Prices[i].Price < day99Prices[i].Price {
 				// symbol当前没有买单,或者买卖单数量相同的情况下可以再次买入
