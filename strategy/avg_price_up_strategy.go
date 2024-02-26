@@ -38,6 +38,16 @@ func (up *AvgPriceUpStrategy) Analysis(symbol string, prices map[common.Interval
 	day25LastPrice := day25Prices[0].Price
 	day99LastPrice := day99Prices[0].Price
 
+	// 至少需要满足3小时数据
+	if length < 3 {
+		return
+	}
+
+	// 必须连续3次上涨，确认强势
+	if !(day7Prices[0].Price > day7Prices[1].Price && day7Prices[1].Price > day7Prices[2].Price) {
+		return
+	}
+
 	sum, e := common.SymbolOrderSumAction(symbol)
 	if e != nil {
 		return nil, e
