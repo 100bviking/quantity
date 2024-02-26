@@ -53,7 +53,9 @@ func init() {
 	client = binance.NewClient(user.ApiKey, user.ApiSecret)
 
 	BlacklistSymbol = map[string]struct{}{
-		"AEUR": {},
+		"AEUR":  {},
+		"TUSD":  {},
+		"FDUSD": {},
 	}
 	WhitelistSymbol = map[string]struct{}{
 		"JUP": {},
