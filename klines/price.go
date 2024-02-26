@@ -9,8 +9,6 @@ import (
 )
 
 const (
-	kLineStartTimestamp int64 = 1672502400 // 2023-01-01 00:00:00
-
 	Hour  = 3600
 	Day   = Hour * 24
 	Month = Day * 30
@@ -53,7 +51,8 @@ func saveKPrice() (err error) {
 
 			currentTime, ok := cursorMap[symbol]
 			if !ok {
-				startTime = kLineStartTimestamp
+				// 如果cursor不存在,默认从1个月之前开始
+				startTime = time.Now().AddDate(0, -1, 0).Unix()
 			} else {
 				startTime = currentTime.Timestamp.Unix()
 			}
