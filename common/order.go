@@ -140,7 +140,9 @@ func SymbolOrderSumAction(symbol string) (sum int64, err error) {
 	order := new(Order)
 	err = db.OrderDB.Model(order).
 		Select("symbol,sum(action) as sum").
-		Where("symbol = ?", symbol).Pluck("sum", &sum).Error
+		Where("symbol = ?", symbol).
+		Group("symbol").
+		Pluck("sum", &sum).Error
 	err = IngoreNotFoundError(err)
 	if err != nil {
 		return
