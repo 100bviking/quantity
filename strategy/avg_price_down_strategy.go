@@ -41,7 +41,7 @@ func (down *AvgPriceDownStrategy) Analysis(symbol string, prices map[common.Inte
 	}
 
 	// 当前价格下跌,7日均线价格小于25日均线价格,即刻止损卖出
-	if sum >= 1 && day7LastPrice < day25LastPrice {
+	if sum >= 1 && (currentPrice < day7LastPrice || day7LastPrice < day25LastPrice) {
 		action.Action = common.Sell
 	}
 	return

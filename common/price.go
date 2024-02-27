@@ -80,7 +80,11 @@ func FetchPrices() (prices map[string]*Price, err error) {
 				if _, okB := BlacklistSymbol[symbol]; okB {
 					continue
 				}
-				if strings.HasSuffix(symbol, "USD") || strings.HasSuffix(symbol, "UP") || strings.HasSuffix(symbol, "DOWN") {
+				if strings.HasSuffix(symbol, "USD") ||
+					strings.HasSuffix(symbol, "UP") ||
+					strings.HasSuffix(symbol, "DOWN") ||
+					strings.HasSuffix(symbol, "BULL") ||
+					strings.HasSuffix(symbol, "BEAR") {
 					continue
 				}
 			}

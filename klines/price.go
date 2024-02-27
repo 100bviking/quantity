@@ -97,7 +97,7 @@ func saveKPrice() (err error) {
 func savePrice() {
 	prices, err := common.FetchPrices()
 	if err != nil || len(prices) == 0 {
-		fmt.Println("fetch price error.")
+		fmt.Println("fetch price error.", err, len(prices))
 		return
 	}
 
