@@ -56,6 +56,7 @@ func init() {
 
 	BlacklistSymbol = map[string]struct{}{
 		"AEUR": {},
+		"ERD":  {},
 	}
 	WhitelistSymbol = map[string]struct{}{
 		"JUP": {},
