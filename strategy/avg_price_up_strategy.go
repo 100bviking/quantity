@@ -57,9 +57,8 @@ func (up *AvgPriceUpStrategy) Analysis(symbol string, prices map[common.Interval
 	gap1 := day7LastPrice - day25LastPrice
 	gap2 := day25LastPrice - day99LastPrice
 	if sum == 0 &&
-		gap1/day25LastPrice > 0.05 &&
-		gap2/day99LastPrice > 0.05 &&
-		currentPrice > day7LastPrice &&
+		gap1/day25LastPrice > 1 &&
+		gap2/day99LastPrice > 1 &&
 		day7LastPrice > day25LastPrice &&
 		day25LastPrice > day99LastPrice &&
 		gap1 > gap2 {
