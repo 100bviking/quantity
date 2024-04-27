@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-const (
-	Hour = 3600
-	Day  = Hour * 24
-	Week = Day * 7
-)
-
 var (
 	wg sync.WaitGroup
 )
@@ -31,7 +25,7 @@ func saveKPrice() (err error) {
 		return
 	}
 
-	now := time.Now().Unix()
+	now := time.Now()
 	channel := make(chan int, 10)
 	for _, symbol := range symbols {
 		channel <- 0
@@ -44,28 +38,15 @@ func saveKPrice() (err error) {
 
 			// 获取symbol对应最大的时间戳
 			var (
-				startTime int64
-				endTime   int64
+				startTime = now.AddDate(0, 0, -7).Unix()
+				endTime   = now.Unix()
 			)
 
 			currentTime, ok := cursorMap[symbol]
-			if !ok {
-				// 如果cursor不存在,默认从1周之前开始
-				startTime = time.Now().AddDate(0, 0, -7).Unix()
-			} else {
+			// 如果当前cursor小于一周内则使用当前cursor,否则取一周前数据
+			if ok && startTime < currentTime.Timestamp.Unix() {
 				startTime = currentTime.Timestamp.Unix()
 			}
-
-			if startTime < now-Week {
-				endTime = startTime + Week
-			} else if startTime < now-Day {
-				endTime = startTime + Day
-			} else if startTime < now-Hour {
-				endTime = startTime + Hour
-			} else {
-				return
-			}
-
 			kLinePrices, e := common.QueryHistoryKLines(symbol, startTime, endTime)
 			if e != nil {
 				fmt.Println("failed to query history klines", symbol, startTime, endTime, e)
