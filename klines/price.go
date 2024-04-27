@@ -9,10 +9,9 @@ import (
 )
 
 const (
-	Hour  = 3600
-	Day   = Hour * 24
-	Month = Day * 30
-	Week  = Day * 7
+	Hour = 3600
+	Day  = Hour * 24
+	Week = Day * 7
 )
 
 var (
@@ -51,15 +50,13 @@ func saveKPrice() (err error) {
 
 			currentTime, ok := cursorMap[symbol]
 			if !ok {
-				// 如果cursor不存在,默认从1个月之前开始
-				startTime = time.Now().AddDate(0, -1, 0).Unix()
+				// 如果cursor不存在,默认从1周之前开始
+				startTime = time.Now().AddDate(0, 0, -7).Unix()
 			} else {
 				startTime = currentTime.Timestamp.Unix()
 			}
 
-			if startTime < now-Month {
-				endTime = startTime + Month
-			} else if startTime < now-Week {
+			if startTime < now-Week {
 				endTime = startTime + Week
 			} else if startTime < now-Day {
 				endTime = startTime + Day

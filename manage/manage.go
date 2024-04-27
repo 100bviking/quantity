@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	sts = append(sts, strategy.NewAvgPriceUpStrategy(), strategy.NewAvgPriceDownStrategy())
+	sts = append(sts, strategy.NewHammerStrategy(), strategy.NewAvgPriceDownStrategy())
 }
 
 func run() {
@@ -41,12 +41,12 @@ func run() {
 
 				fmt.Println("====>starting analysis symbol kline", symbol)
 				// 获取历史数据
-				priceMap, err := getHistoryPrice(symbol)
-				if err != nil || len(priceMap) == 0 {
+				kLines, err := getHistoryPrice(symbol)
+				if err != nil || len(kLines) == 0 {
 					fmt.Println("get history price failed", symbol)
 					return
 				}
-				order, e := st.Analysis(symbol, priceMap)
+				order, e := st.Analysis(symbol, kLines)
 				if e != nil {
 					fmt.Println("execute symbol strategy failed", symbol)
 					return
@@ -72,8 +72,8 @@ func Run() {
 	fmt.Println("start manage service.")
 	c := cron.New()
 
-	// 15分钟分析一次k线
-	err := c.AddFunc("30 */15 * * * *", func() {
+	// 1小时分析一次k线
+	err := c.AddFunc("0 0 * * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())
