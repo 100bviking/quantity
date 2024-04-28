@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/adshao/go-binance/v2 v2.4.5
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/robfig/cron v1.2.0
 	gorm.io/driver/clickhouse v0.6.0

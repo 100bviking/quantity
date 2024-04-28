@@ -44,6 +44,7 @@ type Order struct {
 	OrderTime    time.Time   `gorm:"column:order_time"`
 	Status       OrderStatus `gorm:"column:status"`
 	StrategyName string      `gorm:"column:strategy_name"`
+	MessageID    int         `gorm:"column:message_id"`
 	CreatedAt    time.Time   `gorm:"column:created_at"`
 	UpdatedAt    time.Time   `gorm:"column:updated_at"`
 }
@@ -178,6 +179,25 @@ func FetchSymbolBuyLastOrder(symbol string) (order *Order, err error) {
 	err = IngoreNotFoundError(err)
 	if err != nil {
 		return
+	}
+	return
+}
+
+func FetchUnNotifyOrders() (orders []*Order, err error) {
+	err = db.OrderDB.Where("message_id = 0").Find(&orders).Error
+	err = IngoreNotFoundError(err)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func UpdateOrderMessageID(orders []*Order) (err error) {
+	for _, order := range orders {
+		err = db.OrderDB.Model(order).UpdateColumn("message_id", order.MessageID).Error
+		if err != nil {
+			return
+		}
 	}
 	return
 }

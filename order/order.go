@@ -3,6 +3,7 @@ package order
 import (
 	"fmt"
 	"quantity/common"
+	"quantity/tools"
 	"strconv"
 	"sync"
 	"time"
@@ -81,7 +82,7 @@ func run() {
 	}
 	wg.Wait()
 
-	// 执行结束统一把订单入库
+	// 从redis提取所有订单
 	orders, err := common.TakeAllOrder()
 	if err != nil {
 		fmt.Println("failed to take all orders")
@@ -98,10 +99,34 @@ func run() {
 	}
 }
 
+func notifyOrder() (err error) {
+	orders, err := common.FetchUnNotifyOrders()
+	if err != nil {
+		return
+	}
+	tgBot, err := tools.NewBot()
+	if err != nil {
+		return
+	}
+	for _, order := range orders {
+		message, errNotify := tgBot.NotifyToken(order)
+		if errNotify != nil {
+			return errNotify
+		}
+		order.MessageID = message.MessageID
+	}
+	err = common.UpdateOrderMessageID(orders)
+	return
+}
+
 func Run() {
 	fmt.Println("start order service.")
 	for {
 		run()
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
+		err := notifyOrder()
+		if err != nil {
+			fmt.Println("订单电报通知失败")
+		}
 	}
 }

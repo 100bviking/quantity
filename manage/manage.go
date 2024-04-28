@@ -47,7 +47,7 @@ func run() {
 					return
 				}
 				order, e := st.Analysis(symbol, kLines)
-				if e != nil {
+				if e != nil || order == nil {
 					fmt.Println("execute symbol strategy failed", symbol)
 					return
 				}
@@ -72,8 +72,8 @@ func Run() {
 	fmt.Println("start manage service.")
 	c := cron.New()
 
-	// 1小时分析一次k线,每小时第5分钟执行分析工作
-	err := c.AddFunc("0 11 * * * *", func() {
+	// 1小时分析一次k线,每小时第2分钟执行分析工作
+	err := c.AddFunc("0 2 * * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())
