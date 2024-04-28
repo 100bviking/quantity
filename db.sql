@@ -39,6 +39,7 @@ create table `order`
     order_time    datetime                               not null,
     strategy_name varchar(255) default ''                not null,
     status        int                                    not null comment '0:未知;1:成功;2失败',
+    message_id    int          default 0                 not null comment 'bot通知消息id',
     created_at    datetime     default CURRENT_TIMESTAMP not null,
     updated_at    datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP
 );
