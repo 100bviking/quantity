@@ -85,7 +85,8 @@ func FetchPrices() (prices map[string]*Price, err error) {
 					strings.HasSuffix(symbol, "UP") ||
 					strings.HasSuffix(symbol, "DOWN") ||
 					strings.HasSuffix(symbol, "BULL") ||
-					strings.HasSuffix(symbol, "BEAR") {
+					strings.HasSuffix(symbol, "BEAR") ||
+					strings.HasSuffix(symbol, "USDP") {
 					continue
 				}
 			}

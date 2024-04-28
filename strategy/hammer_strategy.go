@@ -8,10 +8,17 @@ import (
 
 // HammerStrategy   锤子线
 type HammerStrategy struct {
+	name string
+}
+
+func (h *HammerStrategy) Name() string {
+	return h.name
 }
 
 func NewHammerStrategy() Strategy {
-	return &HammerStrategy{}
+	return &HammerStrategy{
+		name: "hammer",
+	}
 }
 
 func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action *common.SubmitOrder, err error) {
@@ -24,10 +31,11 @@ func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 
 	currentPrice := price[symbol]
 	action = &common.SubmitOrder{
-		Symbol:    symbol,
-		Price:     currentPrice,
-		Action:    common.Hold,
-		Timestamp: now,
+		Symbol:       symbol,
+		Price:        currentPrice,
+		Action:       common.Hold,
+		Timestamp:    now,
+		StrategyName: h.name,
 	}
 
 	sum, e := common.SymbolOrderSumAction(symbol)

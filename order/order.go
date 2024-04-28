@@ -19,14 +19,15 @@ func executeOrder(submitOrder *common.SubmitOrder) (err error) {
 	}
 
 	order := &common.Order{
-		Symbol:      submitOrder.Symbol,
-		SubmitPrice: submitOrder.Price,
-		OrderPrice:  price,
-		Action:      submitOrder.Action,
-		OrderTime:   submitOrder.Timestamp,
-		Status:      common.Success,
-		CreatedAt:   time.Time{},
-		UpdatedAt:   time.Time{},
+		Symbol:       submitOrder.Symbol,
+		SubmitPrice:  submitOrder.Price,
+		OrderPrice:   price,
+		Action:       submitOrder.Action,
+		OrderTime:    submitOrder.Timestamp,
+		Status:       common.Success,
+		StrategyName: submitOrder.StrategyName,
+		CreatedAt:    time.Time{},
+		UpdatedAt:    time.Time{},
 	}
 
 	// 每次买入100u

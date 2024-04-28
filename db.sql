@@ -28,20 +28,22 @@ create database `order`;
 use `order`;
 create table `order`
 (
-    id           int auto_increment
+    id            int auto_increment
         primary key,
-    symbol       varchar(15)                        not null,
-    order_price  double                             null comment '订单成交时候的价格',
-    submit_price double                             not null comment '订单提交时候的价格',
-    amount       varchar(255)                       not null comment '成交数量',
-    money        double                             not null comment '成交usdt数量',
-    action       int                                not null comment '0: hold;1:buy;-1:sell',
-    order_time   datetime                           not null,
-    status       int                                not null comment '0:未知;1:成功;2失败',
-    created_at   datetime default CURRENT_TIMESTAMP not null,
-    updated_at   datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP
-)
-    engine = InnoDB;
+    symbol        varchar(15)                            not null,
+    order_price   double                                 null comment '订单成交时候的价格',
+    submit_price  double                                 not null comment '订单提交时候的价格',
+    amount        varchar(255)                           not null comment '成交数量',
+    money         double                                 not null comment '成交usdt数量',
+    action        int                                    not null comment '0: hold;1:buy;-1:sell',
+    order_time    datetime                               not null,
+    strategy_name varchar(255) default ''                not null,
+    status        int                                    not null comment '0:未知;1:成功;2失败',
+    created_at    datetime     default CURRENT_TIMESTAMP not null,
+    updated_at    datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP
+);
+
+
 
 
 

@@ -26,24 +26,26 @@ const (
 
 // SubmitOrder 订单
 type SubmitOrder struct {
-	Symbol    string    // 符号
-	Price     float64   // 交易价格
-	Action    Action    // 买/卖
-	Timestamp time.Time // 策略执行结束的时间点
+	Symbol       string    // 符号
+	Price        float64   // 交易价格
+	Action       Action    // 买/卖
+	Timestamp    time.Time // 策略执行结束的时间点
+	StrategyName string    // 作出策略的名称
 }
 
 type Order struct {
-	Id          int64
-	Symbol      string      `gorm:"column:symbol"`
-	OrderPrice  float64     `gorm:"column:order_price"`
-	SubmitPrice float64     `gorm:"column:submit_price"`
-	Amount      string      `gorm:"column:amount"`
-	Money       float64     `gorm:"column:money"`
-	Action      Action      `gorm:"column:action"`
-	OrderTime   time.Time   `gorm:"column:order_time"`
-	Status      OrderStatus `gorm:"column:status"`
-	CreatedAt   time.Time   `gorm:"column:created_at"`
-	UpdatedAt   time.Time   `gorm:"column:updated_at"`
+	Id           int64
+	Symbol       string      `gorm:"column:symbol"`
+	OrderPrice   float64     `gorm:"column:order_price"`
+	SubmitPrice  float64     `gorm:"column:submit_price"`
+	Amount       string      `gorm:"column:amount"`
+	Money        float64     `gorm:"column:money"`
+	Action       Action      `gorm:"column:action"`
+	OrderTime    time.Time   `gorm:"column:order_time"`
+	Status       OrderStatus `gorm:"column:status"`
+	StrategyName string      `gorm:"column:strategy_name"`
+	CreatedAt    time.Time   `gorm:"column:created_at"`
+	UpdatedAt    time.Time   `gorm:"column:updated_at"`
 }
 
 func (o *Order) TableName() string {

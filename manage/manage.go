@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	sts = append(sts, strategy.NewHammerStrategy(), strategy.NewAvgPriceDownStrategy())
+	sts = append(sts, strategy.NewHammerStrategy(), strategy.NewAvgPriceDownStrategy(), strategy.NewVolumeStrategy())
 }
 
 func run() {
@@ -73,7 +73,7 @@ func Run() {
 	c := cron.New()
 
 	// 1小时分析一次k线,每小时第5分钟执行分析工作
-	err := c.AddFunc("0 5 * * * *", func() {
+	err := c.AddFunc("0 11 * * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())
