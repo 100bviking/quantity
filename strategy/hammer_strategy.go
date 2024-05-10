@@ -59,15 +59,15 @@ func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
 
 	last := kLines[0]
 
-	// 首先必须是上涨的
-	if last.EndPrice < last.StartPrice {
-		return
-	}
-
 	endPrice, _ := strconv.ParseFloat(last.EndPrice, 64)
 	startPrice, _ := strconv.ParseFloat(last.StartPrice, 64)
 	highPrice, _ := strconv.ParseFloat(last.HighPrice, 64)
 	lowPrice, _ := strconv.ParseFloat(last.LowPrice, 64)
+
+	// 首先必须是上涨的
+	if endPrice < startPrice {
+		return
+	}
 
 	// 计算实体长度
 	height := endPrice - startPrice
@@ -88,21 +88,15 @@ func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
 		return
 	}
 
-	// 交易量是上一个小时2倍
-	lastVolume, _ := strconv.ParseFloat(last.VolumeTotalUsd, 64)
-	secondVolume, _ := strconv.ParseFloat(kLines[1].VolumeTotalUsd, 64)
-	if lastVolume/secondVolume < 2 {
-		return
-	}
-
 	// 最近是下跌趋势
-	price := endPrice
-	for _, kLine := range kLines[1:3] {
+	var avgPrice float64
+	for _, kLine := range kLines {
 		currentPrice, _ := strconv.ParseFloat(kLine.EndPrice, 64)
-		if price > currentPrice {
-			return
-		}
-		price = currentPrice
+		avgPrice += currentPrice
+	}
+	avgPrice /= float64(len(kLines))
+	if endPrice > avgPrice {
+		return
 	}
 
 	return true
