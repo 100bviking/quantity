@@ -1,6 +1,7 @@
 package strategy
 
 import (
+	"fmt"
 	"quantity/common"
 	"strconv"
 	"time"
@@ -22,6 +23,7 @@ func NewVolumeStrategy() Strategy {
 }
 
 func (h *VolumeStrategy) Analysis(symbol string, kLines []*common.KLine) (action *common.SubmitOrder, err error) {
+	fmt.Println("开始VolumeStrategy")
 	// 获取当前价格
 	now := time.Now()
 	price, err := getCurrentPrice()

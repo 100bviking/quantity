@@ -1,6 +1,7 @@
 package strategy
 
 import (
+	"fmt"
 	"quantity/common"
 	"strconv"
 	"time"
@@ -22,6 +23,7 @@ func NewHammerStrategy() Strategy {
 }
 
 func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action *common.SubmitOrder, err error) {
+	fmt.Println("开始HammerStrategy")
 	// 获取当前价格
 	now := time.Now()
 	price, err := getCurrentPrice()

@@ -30,10 +30,10 @@ func run() {
 	channel := make(chan int, runtime.NumCPU())
 	for _, symbol := range symbols {
 		// 执行所有策略
-		for _, st := range sts {
+		for _, singleStrategy := range sts {
 			wg.Add(1)
 			channel <- 0
-			go func(symbol string, st strategy.Strategy) {
+			go func(symbol string, currentStrategy strategy.Strategy) {
 				defer func() {
 					wg.Done()
 					<-channel
@@ -46,7 +46,7 @@ func run() {
 					fmt.Println("get history price failed", symbol)
 					return
 				}
-				order, e := st.Analysis(symbol, kLines)
+				order, e := currentStrategy.Analysis(symbol, kLines)
 				if e != nil || order == nil {
 					fmt.Println("execute symbol strategy failed", symbol)
 					return
@@ -61,7 +61,7 @@ func run() {
 					return
 				}
 				fmt.Println("====>end analysis symbol kline", symbol)
-			}(symbol, st)
+			}(symbol, singleStrategy)
 		}
 	}
 	wg.Wait()
