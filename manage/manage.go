@@ -73,7 +73,7 @@ func Run() {
 	c := cron.New()
 
 	// 1小时分析一次k线,每小时第2分钟执行分析工作
-	err := c.AddFunc("0 2 * * * *", func() {
+	err := c.AddFunc("0 2 */4 * * *", func() {
 		fmt.Println("start run manage", time.Now())
 		run()
 		fmt.Println("success run manage", time.Now())
