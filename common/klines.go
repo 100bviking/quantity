@@ -35,7 +35,7 @@ func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePri
 		Symbol(pair).
 		StartTime(start).
 		EndTime(end).
-		Interval("1h").Limit(limit).Do(context.Background())
+		Interval("4h").Limit(limit).Do(context.Background())
 	if err != nil {
 		return
 	}
