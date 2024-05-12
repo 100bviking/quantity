@@ -114,8 +114,11 @@ func notifyOrder() (err error) {
 			return errNotify
 		}
 		order.MessageID = message.MessageID
+		err = common.UpdateOrderMessageID(order)
+		if err != nil {
+			fmt.Println("save order message failed:", order.Id)
+		}
 	}
-	err = common.UpdateOrderMessageID(orders)
 	return
 }
 

@@ -192,12 +192,10 @@ func FetchUnNotifyOrders() (orders []*Order, err error) {
 	return
 }
 
-func UpdateOrderMessageID(orders []*Order) (err error) {
-	for _, order := range orders {
-		err = db.OrderDB.Model(order).UpdateColumn("message_id", order.MessageID).Error
-		if err != nil {
-			return
-		}
+func UpdateOrderMessageID(order *Order) (err error) {
+	err = db.OrderDB.Model(order).UpdateColumn("message_id", order.MessageID).Error
+	if err != nil {
+		return
 	}
 	return
 }
