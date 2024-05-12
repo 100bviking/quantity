@@ -45,11 +45,28 @@ func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 		return nil, e
 	}
 
-	// 判断锤子线形态
-	if h.isHammer(kLines) {
-		action.Action = common.Buy
+	// 判断倒数第二根线是否满足锤子线形态
+	if !h.isHammer(kLines[:len(kLines)-1]) {
+		return
 	}
+
+	// 判断倒数第1根线是否满足上涨
+	if !h.isUp(kLines[len(kLines)-1]) {
+		return
+	}
+	action.Action = common.Buy
+
 	return
+}
+
+func (h *HammerStrategy) isUp(kLine *common.KLine) (is bool) {
+	endPrice, _ := strconv.ParseFloat(kLine.EndPrice, 64)
+	startPrice, _ := strconv.ParseFloat(kLine.StartPrice, 64)
+
+	if endPrice < startPrice {
+		return
+	}
+	return true
 }
 
 func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
@@ -61,7 +78,6 @@ func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
 
 	endPrice, _ := strconv.ParseFloat(last.EndPrice, 64)
 	startPrice, _ := strconv.ParseFloat(last.StartPrice, 64)
-	highPrice, _ := strconv.ParseFloat(last.HighPrice, 64)
 	lowPrice, _ := strconv.ParseFloat(last.LowPrice, 64)
 
 	// 首先必须是上涨的
@@ -72,30 +88,17 @@ func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
 	// 计算实体长度
 	height := endPrice - startPrice
 
-	// 计算上影线高度
-	upHeight := highPrice - endPrice
-
 	// 计算下影线
 	downHeight := startPrice - lowPrice
 
-	// 下影线高度是实体2倍以上
-	if downHeight/height < 2 {
-		return
-	}
-
-	// 上影线高度小于实体的1/5
-	if upHeight/height > 0.2 {
+	// 下影线高度是实体3倍以上
+	if downHeight/height < 3 {
 		return
 	}
 
 	// 最近是下跌趋势
-	var avgPrice float64
-	for _, kLine := range kLines {
-		currentPrice, _ := strconv.ParseFloat(kLine.EndPrice, 64)
-		avgPrice += currentPrice
-	}
-	avgPrice /= float64(len(kLines))
-	if endPrice > avgPrice {
+	firstPrice, _ := strconv.ParseFloat(kLines[len(kLines)-1].EndPrice, 64)
+	if endPrice > firstPrice {
 		return
 	}
 
