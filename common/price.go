@@ -24,6 +24,10 @@ const (
 	Day99 Interval = 99
 )
 
+const (
+	Hour = 3600
+)
+
 var (
 	client          *binance.Client
 	BlacklistSymbol map[string]struct{}

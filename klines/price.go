@@ -39,7 +39,7 @@ func saveKPrice() (err error) {
 			// 获取symbol对应最大的时间戳
 			var (
 				startTime = now.AddDate(0, 0, -7).Unix()
-				endTime   = now.Unix() - 4*3600
+				endTime   = now.Unix() / (4 * common.Hour) * (4 * common.Hour)
 			)
 
 			currentTime, ok := cursorMap[symbol]
