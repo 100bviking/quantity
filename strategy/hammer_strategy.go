@@ -46,12 +46,12 @@ func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 	}
 
 	// 判断倒数第二根线是否满足锤子线形态
-	if !h.isHammer(kLines[:len(kLines)-1]) {
+	if !h.isHammer(kLines[1:]) {
 		return
 	}
 
-	// 判断倒数第1根线是否满足上涨
-	if !h.isUp(kLines[len(kLines)-1]) {
+	// 判断第1根线是否满足上涨
+	if !h.isUp(kLines[0]) {
 		return
 	}
 	action.Action = common.Buy
