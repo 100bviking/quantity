@@ -91,8 +91,8 @@ func (h *HammerStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
 	// 计算下影线
 	downHeight := startPrice - lowPrice
 
-	// 下影线高度是实体3倍以上
-	if downHeight/height < 3 {
+	// 下影线高度是实体2倍以上
+	if downHeight/height < 2 {
 		return
 	}
 
