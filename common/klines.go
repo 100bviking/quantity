@@ -27,7 +27,6 @@ func (k *KLine) TableName() string {
 }
 
 func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePrices []*KLine, err error) {
-	limit := int((endTime - startTime) / 3600)
 	pair := fmt.Sprintf("%s%s", symbol, "USDT")
 	start := startTime * 1000
 	end := endTime * 1000
@@ -35,7 +34,7 @@ func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePri
 		Symbol(pair).
 		StartTime(start).
 		EndTime(end).
-		Interval("4h").Limit(limit).Do(context.Background())
+		Interval("4h").Do(context.Background())
 	if err != nil {
 		return
 	}
