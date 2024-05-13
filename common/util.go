@@ -50,3 +50,27 @@ func Str2Big(amount string, decimals int) (*big.Int, error) {
 		return bigAmt, nil
 	}
 }
+
+func Big2Str(x *big.Int, decimal int) string {
+	if decimal == 0 {
+		return x.String()
+	}
+
+	// Integral part
+	i := x.String()
+	if len(i) <= decimal {
+		i = "0"
+	} else {
+		i = i[0 : len(i)-decimal]
+	}
+
+	// Decimal part
+	d := x.String()
+	if len(d) < decimal {
+		d = strings.Repeat("0", decimal-len(d)) + d
+	} else {
+		d = d[len(d)-decimal:]
+	}
+
+	return i + "." + d
+}
