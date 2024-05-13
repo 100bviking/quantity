@@ -149,18 +149,13 @@ func CountMoney(prices map[string]*Price, orders map[string][]*Order) {
 			if order[i].Action == Buy {
 				buy += order[i].Money
 			}
-			sum += amount * float64(order[i].Action) * order[i].OrderPrice
+			sum += amount * order[i].OrderPrice
 			i++
 		}
 
-		// 奇数代表还没有卖出,减去1笔当前价格
-		if i%2 == 1 {
-			amount, _ := strconv.ParseFloat(order[i-1].Amount, 64)
-			sum += -amount * float64(order[i-1].Action) * prices[symbol].Price
-		}
-		fmt.Printf("symbol:%s,buy:%f,earn money:%f\n", symbol, buy, -sum)
+		fmt.Printf("symbol:%s,buy:%f,earn money:%f\n", symbol, buy, sum-buy)
 		invest += buy
 		total += sum
 	}
-	fmt.Printf("total invest:%f ,money:%f\n", invest, -total)
+	fmt.Printf("total invest:%f ,money:%f\n", invest, total)
 }
