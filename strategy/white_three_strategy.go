@@ -72,10 +72,10 @@ func (h *WhiteThreeStrategy) isWhiteThree(kLines []*common.KLine) (hammer bool) 
 
 	// 最近3根必须连续上涨,且是光头光脚
 	for i := 0; i < 3; i++ {
-		if !kLines[0].IsUp() {
+		if !kLines[i].IsUp() {
 			return
 		}
-		if !kLines[1].IsNoHeadOrFoot() {
+		if !kLines[i].IsNoHeadOrFoot() {
 			return
 		}
 	}
