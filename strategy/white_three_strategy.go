@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// WhiteThreeStrategy
+// WhiteThreeStrategy 白色三兵上攻
 type WhiteThreeStrategy struct {
 	name string
 }
@@ -18,7 +18,7 @@ func (h *WhiteThreeStrategy) Name() string {
 
 func NewWhiteThreeStrategy() Strategy {
 	return &WhiteThreeStrategy{
-		name: "hammer",
+		name: "white_three",
 	}
 }
 
@@ -45,15 +45,11 @@ func (h *WhiteThreeStrategy) Analysis(symbol string, kLines []*common.KLine) (ac
 		return nil, e
 	}
 
-	// 判断倒数第二根线是否满足锤子线形态
-	if !h.isHammer(kLines[1:]) {
+	// 判断是否是白色三兵形态
+	if !h.isWhiteThree(kLines) {
 		return
 	}
 
-	// 判断第1根线是否满足上涨
-	if !h.isUp(kLines[0]) {
-		return
-	}
 	action.Action = common.Buy
 
 	return
@@ -69,36 +65,24 @@ func (h *WhiteThreeStrategy) isUp(kLine *common.KLine) (is bool) {
 	return true
 }
 
-func (h *WhiteThreeStrategy) isHammer(kLines []*common.KLine) (hammer bool) {
-	if len(kLines) < 2 {
+func (h *WhiteThreeStrategy) isWhiteThree(kLines []*common.KLine) (hammer bool) {
+	if len(kLines) < 3 {
 		return
 	}
 
-	last := kLines[0]
-
-	endPrice, _ := strconv.ParseFloat(last.EndPrice, 64)
-	startPrice, _ := strconv.ParseFloat(last.StartPrice, 64)
-	lowPrice, _ := strconv.ParseFloat(last.LowPrice, 64)
-
-	// 首先必须是上涨的
-	if endPrice < startPrice {
-		return
+	// 最近3根必须连续上涨,且是光头光脚
+	for i := 0; i < 3; i++ {
+		if !kLines[0].IsUp() {
+			return
+		}
+		if !kLines[1].IsNoHeadOrFoot() {
+			return
+		}
 	}
 
-	// 计算实体长度
-	height := endPrice - startPrice
-
-	// 计算下影线
-	downHeight := startPrice - lowPrice
-
-	// 下影线高度是实体2倍以上
-	if downHeight/height < 2 {
-		return
-	}
-
-	// 最近是下跌趋势
-	firstPrice, _ := strconv.ParseFloat(kLines[len(kLines)-1].EndPrice, 64)
-	if endPrice > firstPrice {
+	// 最近3根必须是上涨趋势
+	var kl common.KLines = kLines[0:3]
+	if !kl.ContinueUp() {
 		return
 	}
 

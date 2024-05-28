@@ -3,7 +3,6 @@ package strategy
 import (
 	"fmt"
 	"quantity/common"
-	"strconv"
 	"time"
 )
 
@@ -45,29 +44,33 @@ func (h *VolumeStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 		return nil, e
 	}
 
-	// 判断是否异常交易量形态
-	if h.isVolume(kLines) {
-		action.Action = common.Buy
+	// 判断是否最近整体向下
+	var ks common.KLines = kLines[1:]
+	if !ks.ContinueDown() {
+		return
 	}
+
+	// 判断是否最近一根k线是向上
+	if !kLines[0].IsUp() {
+		return
+	}
+
+	// 判断是否异常交易量形态
+
+	if !h.isVolume(kLines) {
+		return
+	}
+	action.Action = common.Buy
 	return
 }
 
+// 美元计价
 func (h *VolumeStrategy) isVolume(kLines []*common.KLine) (hammer bool) {
-	if len(kLines) < 2 {
-		return
-	}
+	var ks common.KLines = kLines[1:]
 
-	last := kLines[0]
-
-	// 首先必须是上涨的
-	if last.EndPrice < last.StartPrice {
-		return
-	}
-
+	lastVolume := kLines[0].Volume()
 	// 交易量是上一个小时10倍
-	lastVolume, _ := strconv.ParseFloat(last.VolumeTotalUsd, 64)
-	secondVolume, _ := strconv.ParseFloat(kLines[1].VolumeTotalUsd, 64)
-	if lastVolume/secondVolume < 10 {
+	if lastVolume/ks.AvgVolume() < 10.0 {
 		return
 	}
 	return true

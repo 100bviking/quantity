@@ -16,7 +16,11 @@ var (
 )
 
 func init() {
-	sts = append(sts, strategy.NewHammerStrategy(), strategy.NewAvgPriceDownStrategy(), strategy.NewVolumeStrategy())
+	sts = append(sts, strategy.NewHammerStrategy(),
+		strategy.NewAvgPriceDownStrategy(),
+		strategy.NewVolumeStrategy(),
+		strategy.NewWhiteThreeStrategy(),
+	)
 }
 
 func run() {

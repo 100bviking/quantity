@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"math"
 	"quantity/common/db"
+	"strconv"
 	"time"
 )
 
@@ -22,8 +24,105 @@ type KLine struct {
 	VolumeTotalCount int64     `gorm:"column:volume_total_count"`
 }
 
+// KLines 注意k线默认是逆序排列的，最新的在最前面
+type KLines []*KLine
+
 func (k *KLine) TableName() string {
 	return "kline"
+}
+
+// IsNoHeadOrFoot 判断k线是否是光头光脚形态
+func (k *KLine) IsNoHeadOrFoot() bool {
+	endPrice, _ := strconv.ParseFloat(k.EndPrice, 64)
+	startPrice, _ := strconv.ParseFloat(k.StartPrice, 64)
+	lowPrice, _ := strconv.ParseFloat(k.LowPrice, 64)
+	highPrice, _ := strconv.ParseFloat(k.HighPrice, 64)
+
+	// 计算实体长度
+	height := math.Abs(endPrice - startPrice)
+
+	var (
+		downHeight, upHeight float64
+	)
+
+	// 如果上涨
+	if endPrice > startPrice {
+		// 计算上影线
+		upHeight = math.Abs(highPrice - endPrice)
+		// 计算下影线
+		downHeight = math.Abs(startPrice - lowPrice)
+	} else {
+		// 计算上影线
+		upHeight = math.Abs(highPrice - startPrice)
+		// 计算下影线
+		downHeight = math.Abs(endPrice - lowPrice)
+	}
+
+	// 上下影线高度不能超过实体的1/5
+	return (upHeight/height) < 0.2 && (downHeight/height) < 0.2
+}
+
+// IsUp 判断K线是否是上涨形态
+func (k *KLine) IsUp() bool {
+	endPrice, _ := strconv.ParseFloat(k.EndPrice, 64)
+	startPrice, _ := strconv.ParseFloat(k.StartPrice, 64)
+
+	return endPrice >= startPrice
+}
+
+func (k *KLine) IsHammer() bool {
+	endPrice, _ := strconv.ParseFloat(k.EndPrice, 64)
+	startPrice, _ := strconv.ParseFloat(k.StartPrice, 64)
+	lowPrice, _ := strconv.ParseFloat(k.LowPrice, 64)
+
+	// 计算实体长度
+	height := endPrice - startPrice
+
+	// 计算下影线
+	downHeight := startPrice - lowPrice
+
+	// 首先必须是上涨的
+	// 下影线高度是实体2倍以上
+	return (endPrice > startPrice) && (downHeight/height >= 2)
+}
+
+// AvgPrice 获取k线平均价
+func (k *KLine) AvgPrice() float64 {
+	endPrice, _ := strconv.ParseFloat(k.EndPrice, 64)
+	startPrice, _ := strconv.ParseFloat(k.StartPrice, 64)
+	return (endPrice + startPrice) / 2
+}
+
+func (k *KLine) Volume() float64 {
+	volume, _ := strconv.ParseFloat(k.VolumeTotalUsd, 64)
+	return volume
+}
+
+func (ks KLines) ContinueUp() bool {
+	for i := 1; i < len(ks); i++ {
+		if ks[i].AvgPrice() < ks[i-1].AvgPrice() {
+			return false
+		}
+	}
+	return true
+}
+
+func (ks KLines) ContinueDown() bool {
+	for i := 1; i < len(ks); i++ {
+		if ks[i].AvgPrice() > ks[i-1].AvgPrice() {
+			return false
+		}
+	}
+	return true
+}
+
+func (ks KLines) AvgVolume() float64 {
+	avgVolume := 0.0
+	for i := 1; i < len(ks); i++ {
+		avgVolume += ks[i].Volume()
+	}
+	avgVolume = avgVolume / float64(len(ks))
+	return avgVolume
 }
 
 func QueryHistoryKLines(symbol string, startTime int64, endTime int64) (kLinePrices []*KLine, err error) {
