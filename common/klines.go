@@ -93,14 +93,26 @@ func (k *KLine) AvgPrice() float64 {
 	return (endPrice + startPrice) / 2
 }
 
+// ClosePrice 获取k线收盘价
+func (k *KLine) ClosePrice() float64 {
+	endPrice, _ := strconv.ParseFloat(k.EndPrice, 64)
+	return endPrice
+}
+
+// OpenPrice 获取k线开盘价
+func (k *KLine) OpenPrice() float64 {
+	startPrice, _ := strconv.ParseFloat(k.StartPrice, 64)
+	return startPrice
+}
+
 func (k *KLine) Volume() float64 {
 	volume, _ := strconv.ParseFloat(k.VolumeTotalUsd, 64)
 	return volume
 }
 
 func (ks KLines) ContinueUp() bool {
-	for i := 1; i < len(ks); i++ {
-		if ks[i].AvgPrice() < ks[i-1].AvgPrice() {
+	for i := 0; i < len(ks)-1; i++ {
+		if ks[i].ClosePrice() < ks[i+1].ClosePrice() {
 			return false
 		}
 	}
@@ -108,8 +120,8 @@ func (ks KLines) ContinueUp() bool {
 }
 
 func (ks KLines) ContinueDown() bool {
-	for i := 1; i < len(ks); i++ {
-		if ks[i].AvgPrice() > ks[i-1].AvgPrice() {
+	for i := 0; i < len(ks)-1; i++ {
+		if ks[i].ClosePrice() > ks[i+1].ClosePrice() {
 			return false
 		}
 	}
