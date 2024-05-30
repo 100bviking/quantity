@@ -13,7 +13,7 @@ create table default.kline
     engine = ReplacingMergeTree PARTITION BY symbol
         PRIMARY KEY (symbol, k_start_time)
         ORDER BY (symbol, k_start_time)
-        ttl k_start_time + INTERVAL 1 MONTH
+        ttl k_start_time + INTERVAL 1 YEAR
         SETTINGS index_granularity = 8192
         comment 'k线数据,按照1小时存储';
 
