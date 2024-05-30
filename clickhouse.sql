@@ -10,7 +10,7 @@ create table default.kline
     volume_total_usd   String comment '成交总金额',
     volume_total_count Int64 comment '成交总笔数'
 )
-    engine = MergeTree PARTITION BY symbol
+    engine = ReplacingMergeTree PARTITION BY symbol
         PRIMARY KEY (symbol, k_start_time)
         ORDER BY (symbol, k_start_time)
         ttl k_start_time + INTERVAL 1 MONTH
