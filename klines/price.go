@@ -43,9 +43,12 @@ func saveKPrice() (err error) {
 			)
 
 			currentTime, ok := cursorMap[symbol]
-			// 如果当前cursor小于一周内则使用当前cursor,否则取一周前数据
 			if ok && startTime < currentTime.Timestamp.Unix() {
 				startTime = currentTime.Timestamp.Unix()
+			}
+			if startTime >= endTime {
+				fmt.Println("开始结束时间相同，跳过")
+				return
 			}
 			kLinePrices, e := common.QueryHistoryKLines(symbol, startTime, endTime)
 			if e != nil {
