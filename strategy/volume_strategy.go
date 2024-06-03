@@ -39,11 +39,6 @@ func (h *VolumeStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 		StrategyName: h.name,
 	}
 
-	sum, e := common.SymbolOrderSumAction(symbol)
-	if e != nil || sum != 0 {
-		return nil, e
-	}
-
 	// 判断是否最近整体向下
 	var ks common.KLines = kLines[1:]
 	if !ks.ContinueDown() {

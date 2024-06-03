@@ -139,20 +139,6 @@ func TakeAllOrder() (orders []*Order, err error) {
 	return
 }
 
-func SymbolOrderSumAction(symbol string) (sum int64, err error) {
-	order := new(Order)
-	err = db.OrderDB.Model(order).
-		Select("sum(action) as sum").
-		Where("symbol = ?", symbol).
-		Group("symbol").
-		Pluck("sum", &sum).Error
-	err = IngoreNotFoundError(err)
-	if err != nil {
-		return
-	}
-	return
-}
-
 func FetchAllOrders() (ordersMap map[string][]*Order, err error) {
 	order := new(Order)
 	ordersMap = make(map[string][]*Order)

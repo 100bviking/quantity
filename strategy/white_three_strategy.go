@@ -39,11 +39,6 @@ func (h *WhiteThreeStrategy) Analysis(symbol string, kLines []*common.KLine) (ac
 		StrategyName: h.name,
 	}
 
-	sum, e := common.SymbolOrderSumAction(symbol)
-	if e != nil || sum != 0 {
-		return nil, e
-	}
-
 	// 判断是否是白色三兵形态
 	if !h.isWhiteThree(kLines) {
 		return

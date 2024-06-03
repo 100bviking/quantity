@@ -39,11 +39,6 @@ func (h *HammerStrategy) Analysis(symbol string, kLines []*common.KLine) (action
 		StrategyName: h.name,
 	}
 
-	sum, e := common.SymbolOrderSumAction(symbol)
-	if e != nil || sum != 0 {
-		return nil, e
-	}
-
 	// 判断第1根线是否满足上涨
 	if !kLines[0].IsUp() {
 		return
