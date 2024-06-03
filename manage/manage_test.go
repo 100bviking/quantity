@@ -21,4 +21,5 @@ func Test_WhiteThree(t *testing.T) {
 		fmt.Println("execute symbol strategy failed", symbol)
 		return
 	}
+	fmt.Printf("order is :%+v\n", order)
 }
