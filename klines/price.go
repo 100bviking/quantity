@@ -12,6 +12,43 @@ var (
 	wg sync.WaitGroup
 )
 
+func saveSymbolPrice(symbol string, cursorMap map[string]*common.Cursor) (err error) {
+	now := time.Now()
+	// 获取symbol对应最大的时间戳
+	var (
+		startTime = now.AddDate(0, 0, -7).Unix()
+		endTime   = (now.Unix()/(4*common.Hour) - 1) * (4 * common.Hour)
+	)
+
+	currentTime, ok := cursorMap[symbol]
+	if ok && startTime < currentTime.Timestamp.Unix() {
+		startTime = currentTime.Timestamp.Unix()
+	}
+	if startTime >= endTime {
+		fmt.Println("开始结束时间相同，跳过")
+		return
+	}
+	kLinePrices, e := common.QueryHistoryKLines(symbol, startTime, endTime)
+	if e != nil {
+		fmt.Println("failed to query history klines", symbol, startTime, endTime, e)
+		return
+	}
+	if len(kLinePrices) > 0 {
+		err = saveKLinesPrice(kLinePrices)
+		if err != nil {
+			fmt.Println("saveKLinesPrice failed:", err, symbol)
+			return
+		}
+	}
+
+	err = common.UpdateSymbolCursor(symbol, endTime)
+	if err != nil {
+		fmt.Println("failed to update symbol cursor", symbol, endTime)
+		return
+	}
+	return
+}
+
 func saveKPrice() (err error) {
 	symbols, err := common.GetCurrentSymbol()
 	if err != nil {
@@ -25,50 +62,15 @@ func saveKPrice() (err error) {
 		return
 	}
 
-	now := time.Now()
 	channel := make(chan int, 10)
 	for _, symbol := range symbols {
 		channel <- 0
 		wg.Add(1)
-		go func(symbol string) {
-			defer func() {
-				<-channel
-				wg.Done()
-			}()
+		go func(symbol string, cursorMap map[string]*common.Cursor) {
+			defer wg.Done()
+			saveSymbolPrice(symbol, cursorMap)
+		}(symbol, cursorMap)
 
-			// 获取symbol对应最大的时间戳
-			var (
-				startTime = now.AddDate(0, 0, -7).Unix()
-				endTime   = (now.Unix()/(4*common.Hour) - 1) * (4 * common.Hour)
-			)
-
-			currentTime, ok := cursorMap[symbol]
-			if ok && startTime < currentTime.Timestamp.Unix() {
-				startTime = currentTime.Timestamp.Unix()
-			}
-			if startTime >= endTime {
-				fmt.Println("开始结束时间相同，跳过")
-				return
-			}
-			kLinePrices, e := common.QueryHistoryKLines(symbol, startTime, endTime)
-			if e != nil {
-				fmt.Println("failed to query history klines", symbol, startTime, endTime, e)
-				return
-			}
-			if len(kLinePrices) > 0 {
-				err = saveKLinesPrice(kLinePrices)
-				if err != nil {
-					fmt.Println("saveKLinesPrice failed:", err)
-					return
-				}
-			}
-
-			err = common.UpdateSymbolCursor(symbol, endTime)
-			if err != nil {
-				fmt.Println("failed to update symbol cursor", symbol, endTime)
-				return
-			}
-		}(symbol)
 	}
 	wg.Wait()
 	close(channel)
