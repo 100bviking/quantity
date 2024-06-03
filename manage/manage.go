@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/robfig/cron"
 	"quantity/common"
+	"quantity/klines"
 	"quantity/strategy"
 	"runtime"
 	"sync"
@@ -77,9 +78,21 @@ func Run() {
 	fmt.Println("start manage service.")
 	c := cron.New()
 
+	// 1分钟运行一次保存当前价格到redis
+	err := c.AddFunc("0 * * * * *", func() {
+		fmt.Println("start run price", time.Now())
+		klines.SaveCurrentPrice()
+		fmt.Println("success run price", time.Now())
+	})
+	if err != nil {
+		panic("failed to add cron manage")
+	}
+
 	// 4小时分析一次k线,每4小时第2分钟执行分析工作
-	err := c.AddFunc("0 2 */4 * * *", func() {
+	err = c.AddFunc("0 2 */4 * * *", func() {
 		fmt.Println("start run manage", time.Now())
+		err = klines.SaveKPrice()
+		fmt.Println("after save price", err)
 		run()
 		fmt.Println("success run manage", time.Now())
 	})

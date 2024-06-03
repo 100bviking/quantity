@@ -2,7 +2,6 @@ package klines
 
 import (
 	"fmt"
-	"github.com/robfig/cron"
 	"quantity/common"
 	"sync"
 	"time"
@@ -49,7 +48,7 @@ func saveSymbolPrice(symbol string, cursorMap map[string]*common.Cursor) (err er
 	return
 }
 
-func saveKPrice() (err error) {
+func SaveKPrice() (err error) {
 	symbols, err := common.GetCurrentSymbol()
 	if err != nil {
 		fmt.Println("failed to get current symbol in saveKPrice.")
@@ -77,7 +76,7 @@ func saveKPrice() (err error) {
 	return
 }
 
-func savePrice() {
+func SaveCurrentPrice() {
 	prices, err := common.FetchPrices()
 	if err != nil || len(prices) == 0 {
 		fmt.Println("fetch price error.", err, len(prices))
@@ -90,41 +89,4 @@ func savePrice() {
 		fmt.Println("save current price error.")
 		return
 	}
-
-	ordersMap, err := common.FetchAllOrders()
-	if err != nil {
-		fmt.Println("failed to fetch all orders")
-		return
-	}
-
-	common.CountMoney(prices, ordersMap)
-}
-
-func Run() {
-	fmt.Println("start klines service.")
-	c := cron.New()
-
-	// 4 小时运行一次,保存k线
-	err := c.AddFunc("0 0 */4 * * *", func() {
-		fmt.Println("start run klines", time.Now())
-		err := saveKPrice()
-		fmt.Println("success run kines", time.Now(), err)
-	})
-	if err != nil {
-		panic("failed to add crontab run in klines")
-	}
-
-	// 1分钟运行一次保存当前价格到redis
-	err = c.AddFunc("0 * * * * *", func() {
-		fmt.Println("start run price", time.Now())
-		savePrice()
-		fmt.Println("success run price", time.Now())
-	})
-	if err != nil {
-		panic("failed to add crontab run in klines")
-	}
-
-	fmt.Println("successfully register klines run")
-	c.Start()
-	select {}
 }

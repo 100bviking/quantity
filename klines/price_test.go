@@ -13,7 +13,15 @@ func Test_saveKPrice(t *testing.T) {
 		return
 	}
 
-	symbol := "ALICE"
-	err = saveSymbolPrice(symbol, cursorMap)
-	fmt.Println(err)
+	symbols, err := common.GetCurrentSymbol()
+	if err != nil {
+		fmt.Println("failed to get current symbol in saveKPrice.")
+		return
+	}
+	for _, symbol := range symbols {
+		err = saveSymbolPrice(symbol, cursorMap)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 }
