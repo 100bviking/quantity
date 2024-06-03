@@ -6,23 +6,23 @@ import (
 	"time"
 )
 
-// WhiteThreeStrategy 白色三兵上攻
-type WhiteThreeStrategy struct {
+// BlackThreeStrategy 三只乌鸦三兵下跌
+type BlackThreeStrategy struct {
 	name string
 }
 
-func (h *WhiteThreeStrategy) Name() string {
+func (h *BlackThreeStrategy) Name() string {
 	return h.name
 }
 
-func NewWhiteThreeStrategy() Strategy {
-	return &WhiteThreeStrategy{
-		name: "white_three",
+func NewBlackThreeStrategy() Strategy {
+	return &BlackThreeStrategy{
+		name: "black_three",
 	}
 }
 
-func (h *WhiteThreeStrategy) Analysis(symbol string, kLines []*common.KLine) (action *common.SubmitOrder, err error) {
-	fmt.Println("开始WhiteThreeStrategy")
+func (h *BlackThreeStrategy) Analysis(symbol string, kLines []*common.KLine) (action *common.SubmitOrder, err error) {
+	fmt.Println("开始BlackThreeStrategy")
 	// 获取当前价格
 	now := time.Now()
 	price, err := getCurrentPrice()
@@ -44,24 +44,24 @@ func (h *WhiteThreeStrategy) Analysis(symbol string, kLines []*common.KLine) (ac
 		return nil, e
 	}
 
-	// 判断是否是白色三兵形态
-	if !h.isWhiteThree(kLines) {
+	// 判断是否是黑色三乌鸦形态
+	if !h.isBlackThree(kLines) {
 		return
 	}
 
-	action.Action = common.Buy
+	action.Action = common.Sell
 
 	return
 }
 
-func (h *WhiteThreeStrategy) isWhiteThree(kLines []*common.KLine) (hammer bool) {
+func (h *BlackThreeStrategy) isBlackThree(kLines []*common.KLine) (hammer bool) {
 	if len(kLines) < 3 {
 		return
 	}
 
-	// 最近3根必须连续上涨,且是光头光脚
+	// 最近3根必须连续下跌,且是光头光脚
 	for i := 0; i < 3; i++ {
-		if !kLines[i].IsUp() {
+		if kLines[i].IsUp() {
 			return
 		}
 		if !kLines[i].IsNoHeadOrFoot() {
@@ -69,9 +69,9 @@ func (h *WhiteThreeStrategy) isWhiteThree(kLines []*common.KLine) (hammer bool) 
 		}
 	}
 
-	// 最近3根必须是上涨趋势
+	// 最近3根必须是下跌趋势
 	var kl common.KLines = kLines[0:3]
-	if !kl.ContinueUp() {
+	if !kl.ContinueDown() {
 		return
 	}
 

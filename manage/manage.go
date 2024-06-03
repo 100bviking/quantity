@@ -20,6 +20,7 @@ func init() {
 		strategy.NewAvgPriceDownStrategy(),
 		strategy.NewVolumeStrategy(),
 		strategy.NewWhiteThreeStrategy(),
+		strategy.NewBlackThreeStrategy(),
 	)
 }
 
