@@ -64,8 +64,8 @@ func (h *VolumeStrategy) isVolume(kLines []*common.KLine) (hammer bool) {
 	var ks common.KLines = kLines[1:]
 
 	lastVolume := kLines[0].Volume()
-	// 交易量是上一个小时10倍
-	if lastVolume/ks.AvgVolume() < 10.0 {
+	// 交易量是上一个小时5倍
+	if lastVolume/ks.AvgVolume() < 5.0 {
 		return
 	}
 	return true
