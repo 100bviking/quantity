@@ -112,7 +112,10 @@ func (k *KLine) Volume() float64 {
 
 func (ks KLines) ContinueUp() bool {
 	for i := 0; i < len(ks)-1; i++ {
-		if ks[i].ClosePrice() < ks[i+1].ClosePrice() {
+		if !ks[i].IsUp() {
+			return false
+		}
+		if ks[i].OpenPrice() < ks[i+1].ClosePrice() {
 			return false
 		}
 	}
@@ -121,7 +124,10 @@ func (ks KLines) ContinueUp() bool {
 
 func (ks KLines) ContinueDown() bool {
 	for i := 0; i < len(ks)-1; i++ {
-		if ks[i].ClosePrice() > ks[i+1].ClosePrice() {
+		if ks[i].IsUp() {
+			return false
+		}
+		if ks[i].OpenPrice() > ks[i+1].ClosePrice() {
 			return false
 		}
 	}
