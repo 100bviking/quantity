@@ -7,7 +7,7 @@ import (
 )
 
 func Test_WhiteThree(t *testing.T) {
-	symbol := "ALICE"
+	symbol := "BTC"
 	// 获取历史数据
 	kLines, err := getHistoryPrice(symbol)
 	if err != nil || len(kLines) == 0 {
