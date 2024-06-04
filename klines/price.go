@@ -12,6 +12,7 @@ var (
 )
 
 func saveSymbolPrice(symbol string, cursorMap map[string]*common.Cursor) (err error) {
+	fmt.Println("start save kline:", symbol)
 	now := time.Now()
 	// 获取symbol对应最大的时间戳
 	var (
@@ -66,10 +67,12 @@ func SaveKPrice() (err error) {
 		channel <- 0
 		wg.Add(1)
 		go func(symbol string, cursorMap map[string]*common.Cursor) {
-			defer wg.Done()
+			defer func() {
+				wg.Done()
+				<-channel
+			}()
 			saveSymbolPrice(symbol, cursorMap)
 		}(symbol, cursorMap)
-
 	}
 	wg.Wait()
 	close(channel)
