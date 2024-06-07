@@ -16,7 +16,8 @@ func saveSymbolPrice(symbol string, cursorMap map[string]*common.Cursor) (err er
 	now := time.Now()
 	// 获取symbol对应最大的时间戳
 	var (
-		startTime = now.AddDate(0, 0, -7).Unix()
+		// if cursor is 0, get 1 month day
+		startTime = now.AddDate(0, -1, 0).Unix()
 		endTime   = (now.Unix()/(4*common.Hour) - 1) * (4 * common.Hour)
 	)
 
